@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crimson Marrow</title>
-    <!-- Gerekli JavaScript Motorları -->
+    <!-- Tarayıcının Kodu Okuması İçin Gerekli Olan Tüm Hazır Motorlar -->
     <script src="https://unpkg.com" crossorigin></script>
     <script src="https://unpkg.com" crossorigin></script>
     <script src="https://unpkg.com"></script>
@@ -14,10 +14,127 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // BURAYA O DEVASA KODUN TAMAMINI YAPIŞTIR
-        // (Sadece en üstteki import ... satırlarını sil, gerisini aynen koy)
+        // 1. VERİ MİMARİSİ & KATEGORİLER
+        const CATEGORIES = ["Laboratuvar", "Zinden", "Amnezi", "Vicdan"];
+        
+        const CATEGORY_META = {
+            Laboratuvar: { blurb: "Deneyler, formüller, kuram taslakları.", symbol: "☣" },
+            Zinden: { blurb: "Karanlık düşüncelerin hücreleri.", symbol: "⛓" },
+            Amnezi: { blurb: "Unutulmuş anılar, kayıp kayıtlar.", symbol: "⚪" },
+            Vicdan: { blurb: "Hesaplaşmalar, insani kalıntılar.", symbol: "⚖" }
+        };
 
-        // Kod bittiğinde en alt satıra şu tetikleyiciyi ekle:
+        const INITIAL_POSTS = [
+            { id: "1", title: "Deney Prototipi #09", slug: "deney-prototipi-09", category: "Laboratuvar", excerpt: "Hücre yenilenmesi beklentinin ötesinde hızlandı ancak denek siber uyarıları reddediyor...", date: "2026-07-07", content: "Laboratuvarda yürütülen son siber çalışmalarda denek üzerinde beklenmedik reaksiyonlar gözlemlendi. Protokol 09 aktif edildi." },
+            { id: "2", title: "Hücre Blokları Raporu", slug: "hucre-bloklari-raporu", category: "Zinden", excerpt: "Derin zindan koridorlarında yankılanan frekanslar yapay zekanın kontrolünden çıkmak üzere.", date: "2026-07-06", content: "Zindan bloklarındaki veri sızıntısı bariyerlerle kapatıldı. Güvenlik önlemleri maksimum seviyeye çekildi." }
+        ];
+
+        // 2. ANA UYGULAMA BİLEŞENİ
+        function App() {
+            const [posts, setPosts] = React.useState(INITIAL_POSTS);
+            const [selectedCategory, setSelectedCategory] = React.useState(null);
+            const [searchQuery, setSearchQuery] = React.useState("");
+
+            const filteredPosts = posts.filter(post => {
+                const matchesCategory = selectedCategory ? post.category === selectedCategory : true;
+                const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            return (
+                <div class="min-h-screen bg-gray-950 text-gray-100 font-sans selection:bg-red-500 selection:text-white">
+                    {/* Üst Menü */}
+                    <header class="border-b border-gray-800 bg-gray-900/50 backdrop-blur sticky top-0 z-50">
+                        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="flex items-center gap-3 cursor-pointer" onClick={() => setSelectedCategory(null)}>
+                                <span class="text-2xl text-red-500 font-bold tracking-wider">CRIMSON MARROW</span>
+                                <span class="px-2 py-0.5 text-xs bg-red-950 text-red-400 border border-red-800 rounded font-mono">v1.0.0</span>
+                            </div>
+                            
+                            {/* Arama Kutusu */}
+                            <div class="w-full sm:w-64">
+                                <input 
+                                    type="text" 
+                                    placeholder="Terminalde ara..." 
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    class="w-full bg-gray-950 border border-gray-800 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-red-500 text-gray-200 transition-colors"
+                                />
+                            </div>
+                        </div>
+                    </header>
+
+                    <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        {/* Sol Menü: Kategoriler */}
+                        <aside class="lg:col-span-1 space-y-2">
+                            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-3">Sektörler</h3>
+                            <button 
+                                onClick={() => setSelectedCategory(null)}
+                                class={`w-full text-left px-3 py-2 rounded text-sm transition-colors flex justify-between items-center ${!selectedCategory ? 'bg-red-950/40 text-red-400 border border-red-900/60' : 'hover:bg-gray-900 text-gray-400'}`}
+                            >
+                                <span>⚡ Tüm Akış</span>
+                                <span class="text-xs bg-gray-900 px-1.5 py-0.5 rounded border border-gray-800 text-gray-500">{posts.length}</span>
+                            </button>
+                            {CATEGORIES.map(cat => {
+                                const count = posts.filter(p => p.category === cat).length;
+                                return (
+                                    <button 
+                                        key={cat}
+                                        onClick={() => setSelectedCategory(cat)}
+                                        class={`w-full text-left px-3 py-2 rounded text-sm transition-colors flex justify-between items-center ${selectedCategory === cat ? 'bg-red-950/40 text-red-400 border border-red-900/60' : 'hover:bg-gray-900 text-gray-400'}`}
+                                    >
+                                        <span class="flex items-center gap-2">
+                                            <span class="text-gray-500">{CATEGORY_META[cat].symbol}</span>
+                                            {cat}
+                                        </span>
+                                        <span class="text-xs bg-gray-900 px-1.5 py-0.5 rounded border border-gray-800 text-gray-500">{count}</span>
+                                    </button>
+                                );
+                            })}
+                        </aside>
+
+                        {/* Sağ Alan: Kod Akışı */}
+                        <section class="lg:col-span-3 space-y-6">
+                            {selectedCategory && (
+                                <div class="bg-gray-900/30 border border-gray-800/80 rounded p-4 mb-6">
+                                    <div class="flex items-center gap-2 text-red-400 font-medium mb-1">
+                                        <span>{CATEGORY_META[selectedCategory].symbol}</span>
+                                        <h4>{selectedCategory} Sektörü</h4>
+                                    </div>
+                                    <p class="text-sm text-gray-500">{CATEGORY_META[selectedCategory].blurb}</p>
+                                </div>
+                            )}
+
+                            {filteredPosts.length === 0 ? (
+                                <div class="border border-dashed border-gray-800 rounded-lg p-12 text-center text-gray-500">
+                                    Aranan kriterlere uygun veri kaydı bulunamadı.
+                                </div>
+                            ) : (
+                                filteredPosts.map(post => (
+                                    <article key={post.id} class="border border-gray-800 bg-gray-900/20 rounded-lg p-6 hover:border-gray-700 transition-all group">
+                                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                            <span class="text-xs font-mono bg-gray-900 border border-gray-800 text-gray-400 px-2 py-0.5 rounded">
+                                                {post.category}
+                                            </span>
+                                            <time class="text-xs text-gray-600 font-mono">{post.date}</time>
+                                        </div>
+                                        <h2 class="text-xl font-semibold text-gray-200 group-hover:text-red-400 transition-colors mb-2">
+                                            {post.title}
+                                        </h2>
+                                        <p class="text-sm text-gray-400 leading-relaxed font-mono">
+                                            {post.excerpt}
+                                        </p>
+                                    </article>
+                                ))
+                            )}
+                        </section>
+                    </main>
+                </div>
+            );
+        }
+
+        // 3. UYGULAMAYI BAŞLATMA
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(React.createElement(App));
     </script>
