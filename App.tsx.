@@ -235,3 +235,6 @@ export function getArchive(): Archive {
   const posts = loadPosts();
   const map: Archive = {};
   for (const p of posts) {
+// React uygulamasını ekrandaki root elementine bağlıyoruz
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
