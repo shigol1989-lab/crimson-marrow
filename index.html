@@ -3,140 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crimson Marrow</title>
-    <!-- Tarayıcının Kodu Okuması İçin Gerekli Olan Tüm Hazır Motorlar -->
-    <script src="https://unpkg.com" crossorigin></script>
-    <script src="https://unpkg.com" crossorigin></script>
-    <script src="https://unpkg.com"></script>
-    <script src="https://jsdelivr.net"></script>
+    <title>Crimson Marrow v1.0.0</title>
+    <!-- Tailwind CSS (Görsel Tasarım Motoru) -->
+    <script src="https://tailwindcss.com"></script>
+    <style>
+        /* Siber Gerilla Özel Efektleri */
+        .cyber-grid {
+            background-image: linear-gradient(rgba(239, 68, 68, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(239, 68, 68, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .scanline {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.3)), linear-gradient(to right, rgba(255,0,0,0.1), rgba(0,255,0,0.02), rgba(0,0,255,0.1));
+            background-size: 100% 4px, 6px 100%;
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-white">
-    <div id="root"></div>
+<body class="bg-slate-950 text-slate-100 font-mono min-h-screen cyber-grid relative overflow-x-hidden selection:bg-red-600 selection:text-white">
+    
+    <div class="absolute inset-0 scanline pointer-events-none z-50 opacity-30"></div>
 
-    <script type="text/babel">
-        // 1. VERİ MİMARİSİ & KATEGORİLER
-        const CATEGORIES = ["Laboratuvar", "Zinden", "Amnezi", "Vicdan"];
+    <!-- Üst Menü / Terminal Header -->
+    <header class="border-b border-red-900/40 bg-slate-900/80 backdrop-blur sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="filterCategory(null)">
+                <span class="text-xl font-black tracking-widest text-red-500 animate-pulse">CRIMSON_MARROW</span>
+                <span class="px-2 py-0.5 text-xs bg-red-950/60 text-red-400 border border-red-800/60 rounded font-mono">SYS_CORE_v1.0</span>
+            </div>
+            
+            <!-- Canlı Terminal Arama Kutusu -->
+            <div class="w-full sm:w-72 relative">
+                <span class="absolute left-3 top-2.5 text-red-500 text-sm">&gt;</span>
+                <input 
+                    type="text" 
+                    id="cyberSearch"
+                    placeholder="Veri tabanında ara..." 
+                    oninput="searchPosts()"
+                    class="w-full bg-slate-950 border border-red-900/50 rounded pl-7 pr-3 py-2 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-red-400 font-mono transition-all placeholder-red-900/60"
+                />
+            </div>
+        </div>
+    </header>
+
+    <!-- Ana İçerik Alanı -->
+    <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         
-        const CATEGORY_META = {
-            Laboratuvar: { blurb: "Deneyler, formüller, kuram taslakları.", symbol: "☣" },
-            Zinden: { blurb: "Karanlık düşüncelerin hücreleri.", symbol: "⛓" },
-            Amnezi: { blurb: "Unutulmuş anılar, kayıp kayıtlar.", symbol: "⚪" },
-            Vicdan: { blurb: "Hesaplaşmalar, insani kalıntılar.", symbol: "⚖" }
-        };
+        <!-- Sol Panel: Siber Sektörler -->
+        <aside class="lg:col-span-1 space-y-2">
+            <div class="text-[10px] font-bold text-red-500/60 uppercase tracking-widest px-3 mb-2 flex items-center justify-between">
+                <span>[SEKTÖR_FİLTRESİ]</span>
+                <span class="animate-ping h-1.5 w-1.5 rounded-full bg-red-500"></span>
+            </div>
+            
+            <button 
+                id="cat-all"
+                onclick="filterCategory(null)"
+                class="w-full text-left px-4 py-2.5 rounded text-sm transition-all flex justify-between items-center bg-red-950/30 text-red-400 border border-red-900/60 shadow-[0_0_10px_rgba(153,27,27,0.1)]"
+            >
+                <span>⚡ TÜM_AKIŞ</span>
+                <span id="count-all" class="text-xs bg-slate-900 px-2 py-0.5 rounded border border-red-900/30 text-red-500 font-bold">0</span>
+            </button>
 
-        const INITIAL_POSTS = [
-            { id: "1", title: "Deney Prototipi #09", slug: "deney-prototipi-09", category: "Laboratuvar", excerpt: "Hücre yenilenmesi beklentinin ötesinde hızlandı ancak denek siber uyarıları reddediyor...", date: "2026-07-07", content: "Laboratuvarda yürütülen son siber çalışmalarda denek üzerinde beklenmedik reaksiyonlar gözlemlendi. Protokol 09 aktif edildi." },
-            { id: "2", title: "Hücre Blokları Raporu", slug: "hucre-bloklari-raporu", category: "Zinden", excerpt: "Derin zindan koridorlarında yankılanan frekanslar yapay zekanın kontrolünden çıkmak üzere.", date: "2026-07-06", content: "Zindan bloklarındaki veri sızıntısı bariyerlerle kapatıldı. Güvenlik önlemleri maksimum seviyeye çekildi." }
+            <button 
+                id="cat-Laboratuvar"
+                onclick="filterCategory('Laboratuvar')"
+                class="w-full text-left px-4 py-2.5 rounded text-sm transition-all flex justify-between items-center hover:bg-slate-900/60 text-slate-400 border border-transparent"
+            >
+                <span class="flex items-center gap-2"><span>☣</span> Laboratuvar</span>
+                <span id="count-Laboratuvar" class="text-xs bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-slate-500">0</span>
+            </button>
+
+            <button 
+                id="cat-Zinden"
+                onclick="filterCategory('Zinden')"
+                class="w-full text-left px-4 py-2.5 rounded text-sm transition-all flex justify-between items-center hover:bg-slate-900/60 text-slate-400 border border-transparent"
+            >
+                <span class="flex items-center gap-2"><span>⛓</span> Zinden</span>
+                <span id="count-Zinden" class="text-xs bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-slate-500">0</span>
+            </button>
+
+            <button 
+                id="cat-Amnezi"
+                onclick="filterCategory('Amnezi')"
+                class="w-full text-left px-4 py-2.5 rounded text-sm transition-all flex justify-between items-center hover:bg-slate-900/60 text-slate-400 border border-transparent"
+            >
+                <span class="flex items-center gap-2"><span>⚪</span> Amnezi</span>
+                <span id="count-Amnezi" class="text-xs bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-slate-500">0</span>
+            </button>
+
+            <button 
+                id="cat-Vicdan"
+                onclick="filterCategory('Vicdan')"
+                class="w-full text-left px-4 py-2.5 rounded text-sm transition-all flex justify-between items-center hover:bg-slate-900/60 text-slate-400 border border-transparent"
+            >
+                <span class="flex items-center gap-2"><span>⚖</span> Vicdan</span>
+                <span id="count-Vicdan" class="text-xs bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-slate-500">0</span>
+            </button>
+        </aside>
+
+        <!-- Sağ Panel: Kod Günlükleri Akışı -->
+        <section class="lg:col-span-3 space-y-4" id="postsContainer">
+            <!-- Dosyalar JavaScript ile buraya akacak -->
+        </section>
+    </main>
+
+    <!-- JavaScript Motoru -->
+    <script>
+        // VERİ TABANI
+        const POSTS = [
+            { id: "1", title: "Deney Prototipi #09", category: "Laboratuvar", excerpt: "Hücre yenilenmesi beklentinin ötesinde hızlandı ancak denek siber uyarıları reddediyor...", date: "2026-07-07" },
+            { id: "2", title: "Hücre Blokları Güvenlik Raporu", category: "Zinden", excerpt: "Derin zindan koridorlarında yankılanan frekanslar yapay zekanın ana omurgasından sızıyor.", date: "2026-07-06" },
+            { id: "3", title: "Hafıza Silme Protokolü", category: "Amnezi", excerpt: "Deneklerin son 48 saatlik anıları başarıyla izole edildi. Geri yükleme noktaları imha edildi.", date: "2026-07-05" },
+            { id: "4", title: "Manevi Hesaplaşma Arayüzü", category: "Vicdan", excerpt: "Siber sistemlerin insan vicdanı üzerindeki baskı katsayısı %42 oranında artış gösterdi.", date: "2026-07-04" }
         ];
 
-        // 2. ANA UYGULAMA BİLEŞENİ
-        function App() {
-            const [posts, setPosts] = React.useState(INITIAL_POSTS);
-            const [selectedCategory, setSelectedCategory] = React.useState(null);
-            const [searchQuery, setSearchQuery] = React.useState("");
+        let activeCategory = null;
+        let activeQuery = "";
 
-            const filteredPosts = posts.filter(post => {
-                const matchesCategory = selectedCategory ? post.category === selectedCategory : true;
-                const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+        // SAYAÇLARI GÜNCELLEME
+        function updateCounters() {
+            document.getElementById('count-all').innerText = POSTS.length;
+            ["Laboratuvar", "Zinden", "Amnezi", "Vicdan"].forEach(cat => {
+                const count = POSTS.filter(p => p.category === cat).length;
+                document.getElementById(`count-${cat}`).innerText = count;
+            });
+        }
+
+        // POSTLARI EKRANA BASMA FONKSİYONU
+        function renderPosts() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = "";
+
+            const filtered = POSTS.filter(post => {
+                const matchesCategory = activeCategory ? post.category === activeCategory : true;
+                const matchesSearch = post.title.toLowerCase().includes(activeQuery.toLowerCase()) || 
+                                      post.excerpt.toLowerCase().includes(activeQuery.toLowerCase());
                 return matchesCategory && matchesSearch;
             });
 
-            return (
-                <div class="min-h-screen bg-gray-950 text-gray-100 font-sans selection:bg-red-500 selection:text-white">
-                    {/* Üst Menü */}
-                    <header class="border-b border-gray-800 bg-gray-900/50 backdrop-blur sticky top-0 z-50">
-                        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <div class="flex items-center gap-3 cursor-pointer" onClick={() => setSelectedCategory(null)}>
-                                <span class="text-2xl text-red-500 font-bold tracking-wider">CRIMSON MARROW</span>
-                                <span class="px-2 py-0.5 text-xs bg-red-950 text-red-400 border border-red-800 rounded font-mono">v1.0.0</span>
-                            </div>
-                            
-                            {/* Arama Kutusu */}
-                            <div class="w-full sm:w-64">
-                                <input 
-                                    type="text" 
-                                    placeholder="Terminalde ara..." 
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    class="w-full bg-gray-950 border border-gray-800 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-red-500 text-gray-200 transition-colors"
-                                />
-                            </div>
-                        </div>
-                    </header>
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="border border-dashed border-red-900/40 rounded bg-slate-900/20 p-12 text-center text-red-400/60 font-mono text-sm">
+                        [UYARI: KRİTERLERE UYGUN VERİ KAYDI BULUNAMADI]
+                    </div>
+                `;
+                return;
+            }
 
-                    <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
-                        {/* Sol Menü: Kategoriler */}
-                        <aside class="lg:col-span-1 space-y-2">
-                            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-3">Sektörler</h3>
-                            <button 
-                                onClick={() => setSelectedCategory(null)}
-                                class={`w-full text-left px-3 py-2 rounded text-sm transition-colors flex justify-between items-center ${!selectedCategory ? 'bg-red-950/40 text-red-400 border border-red-900/60' : 'hover:bg-gray-900 text-gray-400'}`}
-                            >
-                                <span>⚡ Tüm Akış</span>
-                                <span class="text-xs bg-gray-900 px-1.5 py-0.5 rounded border border-gray-800 text-gray-500">{posts.length}</span>
-                            </button>
-                            {CATEGORIES.map(cat => {
-                                const count = posts.filter(p => p.category === cat).length;
-                                return (
-                                    <button 
-                                        key={cat}
-                                        onClick={() => setSelectedCategory(cat)}
-                                        class={`w-full text-left px-3 py-2 rounded text-sm transition-colors flex justify-between items-center ${selectedCategory === cat ? 'bg-red-950/40 text-red-400 border border-red-900/60' : 'hover:bg-gray-900 text-gray-400'}`}
-                                    >
-                                        <span class="flex items-center gap-2">
-                                            <span class="text-gray-500">{CATEGORY_META[cat].symbol}</span>
-                                            {cat}
-                                        </span>
-                                        <span class="text-xs bg-gray-900 px-1.5 py-0.5 rounded border border-gray-800 text-gray-500">{count}</span>
-                                    </button>
-                                );
-                            })}
-                        </aside>
-
-                        {/* Sağ Alan: Kod Akışı */}
-                        <section class="lg:col-span-3 space-y-6">
-                            {selectedCategory && (
-                                <div class="bg-gray-900/30 border border-gray-800/80 rounded p-4 mb-6">
-                                    <div class="flex items-center gap-2 text-red-400 font-medium mb-1">
-                                        <span>{CATEGORY_META[selectedCategory].symbol}</span>
-                                        <h4>{selectedCategory} Sektörü</h4>
-                                    </div>
-                                    <p class="text-sm text-gray-500">{CATEGORY_META[selectedCategory].blurb}</p>
-                                </div>
-                            )}
-
-                            {filteredPosts.length === 0 ? (
-                                <div class="border border-dashed border-gray-800 rounded-lg p-12 text-center text-gray-500">
-                                    Aranan kriterlere uygun veri kaydı bulunamadı.
-                                </div>
-                            ) : (
-                                filteredPosts.map(post => (
-                                    <article key={post.id} class="border border-gray-800 bg-gray-900/20 rounded-lg p-6 hover:border-gray-700 transition-all group">
-                                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                                            <span class="text-xs font-mono bg-gray-900 border border-gray-800 text-gray-400 px-2 py-0.5 rounded">
-                                                {post.category}
-                                            </span>
-                                            <time class="text-xs text-gray-600 font-mono">{post.date}</time>
-                                        </div>
-                                        <h2 class="text-xl font-semibold text-gray-200 group-hover:text-red-400 transition-colors mb-2">
-                                            {post.title}
-                                        </h2>
-                                        <p class="text-sm text-gray-400 leading-relaxed font-mono">
-                                            {post.excerpt}
-                                        </p>
-                                    </article>
-                                ))
-                            )}
-                        </section>
-                    </main>
-                </div>
-            );
+            filtered.forEach(post => {
+                const article = document.createElement('article');
+                article.className = "border border-slate-900 bg-slate-900/30 rounded-lg p-6 hover:border-red-900/50 hover:bg-slate-900/50 transition-all duration-300 group shadow-sm";
+                article.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <span class="text-[11px] font-bold font-mono bg-slate-950 border border-slate-800 text-red-400 px-2 py-0.5 rounded uppercase tracking-wider">
+                            // ${post.category}
+                        </span>
+                        <span class="text-xs text-slate-600 font-mono">${post.date}</span>
+                    </div>
+                    <h2 class="text-lg font-bold text-slate-200 group-hover:text-red-400 transition-colors mb-2 tracking-wide">
+                        ${post.title}
+                    </h2>
+                    <p class="text-sm text-slate-400 leading-relaxed font-mono border-l-2 border-slate-800 pl-3 group-hover:border-red-900/40 transition-all">
+                        ${post.excerpt}
+                    </p>
+                `;
+                container.appendChild(article);
+            });
         }
 
-        // 3. UYGULAMAYI BAŞLATMA
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(React.createElement(App));
-    </script>
-</body>
-</html>
+        // KATEGORİ FİLTRELEME TETİKLEYİCİSİ
+        function filterCategory(category) {
+            activeCategory = category;
+            
+            // Buton stillerini güncelle
+            const buttons = ['all', 'Laboratuvar', 'Zinden', 'Amnezi', 'Vicdan'];
+            buttons.forEach(b => {
+                const btn = document.getElementById(`cat-${b}`);
