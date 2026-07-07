@@ -4,33 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crimson Marrow</title>
-    <!-- Gerekli React ve Babel Tarayıcı Motorları -->
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <!-- Gerekli JavaScript Motorları -->
+    <script src="https://unpkg.com" crossorigin></script>
+    <script src="https://unpkg.com" crossorigin></script>
     <script src="https://unpkg.com"></script>
-    <!-- Tailwind CSS (Tasarım ve Renkler İçin) -->
     <script src="https://jsdelivr.net"></script>
 </head>
 <body class="bg-gray-900 text-white">
-    <!-- Uygulamanın Ekrana Basılacağı Alan -->
     <div id="root"></div>
 
-    <!-- Sihirli Entegrasyon Komutu -->
-    <script type="text/babel" data-presets="react">
-        // Tarayıcıya App.tsx dosyasını zorla okutuyoruz
-        fetch('App.tsx')
-            .then(response => response.text())
-            .then(code => {
-                // Kodun içindeki harici import satırlarını tarayıcı hata vermesin diye temizliyoruz
-                const cleanCode = code
-                    .replace(/import\s+[\s\S]*?from\s+['"].*?['"];?/g, '')
-                    .replace(/export\s+/g, '');
-                
-                // Kodu tarayıcının hafızasında çalıştırıp ekrana basıyoruz
-                const fullScript = cleanCode + `\nconst root = ReactDOM.createRoot(document.getElementById('root'));\nroot.render(React.createElement(App || () => <div>Uygulama Yükleniyor...</div>));`;
-                Babel.run(fullScript);
-            })
-            .catch(err => console.error("Kod yükleme hatası:", err));
+    <script type="text/babel">
+        // BURAYA O DEVASA KODUN TAMAMINI YAPIŞTIR
+        // (Sadece en üstteki import ... satırlarını sil, gerisini aynen koy)
+
+        // Kod bittiğinde en alt satıra şu tetikleyiciyi ekle:
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(App));
     </script>
 </body>
 </html>
